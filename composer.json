@@ -1,0 +1,23 @@
+{
+  "name": "chilimatic/cache-component",
+  "description": "cache component within the chilimatic framework",
+  "type": "library",
+  "license": "MIT",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Jakob Oberhummer",
+      "email": "office@chilimatic.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=5.4",
+    "chilimatic/interfaces-component": "1.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "chilimatic\\lib\\Cache\\": "src/"
+    }
+  }
+}

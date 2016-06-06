@@ -121,10 +121,10 @@ class Memcached extends \Memcached implements ICache
      *
      * @return boolean
      */
-    public function set($key, $value = null, $expiration = 0)
+    public function set($key, $value = null, $expiration = 0, &$udf_flags = NULL)
     {
 
-        if (parent::set($key, $value, ($expiration ? $expiration : null))) {
+        if (parent::set($key, $value, ($expiration ? $expiration : null), $udf_flags)) {
             $expiration = empty($expiration) ? 0 : $expiration;
 
             // Prepare Listing
@@ -159,7 +159,7 @@ class Memcached extends \Memcached implements ICache
      *
      * @return mixed
      */
-    public function get($key = null, $cache_cb = null, &$cas_token = null)
+    public function get($key = null, $cache_cb = null, &$cas_token = null, &$udf_flags = NULL)
     {
 
         if (isset($this->cacheListing [$key])) {
@@ -198,10 +198,10 @@ class Memcached extends \Memcached implements ICache
      *
      * @return boolean
      */
-    public function add($key, $value, $expiration = null)
+    public function add($key, $value, $expiration = null, &$udf_flags = NULL)
     {
 
-        return $this->set($key, $value, $expiration);
+        return $this->set($key, $value, $expiration, $udf_flags);
     }
 
     /**

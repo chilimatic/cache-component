@@ -3,7 +3,7 @@
   "description": "cache component within the chilimatic framework",
   "type": "library",
   "license": "MIT",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "authors": [
     {
       "name": "Jakob Oberhummer",
@@ -13,7 +13,7 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.0",
-    "chilimatic/interfaces-component": "1.*"
+    "chilimatic/interfaces-component": "2.*"
   },
   "autoload": {
     "psr-4": {

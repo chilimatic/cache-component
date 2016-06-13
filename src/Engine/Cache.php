@@ -3,7 +3,7 @@
 namespace chilimatic\lib\Cache\Engine;
 
 use chilimatic\lib\Cache\Exception\CacheException;
-use \chilimatic\lib\Interfaces\ISingelton;
+use chilimatic\lib\Interfaces\ISingelton;
 
 /**
  * Class Cache
@@ -17,14 +17,14 @@ class Cache implements ISingelton
      *
      * @var object
      */
-    public $cache = null;
+    public $cache;
 
     /**
      * login credentials if needed
      *
      * @var array
      */
-    public $credentials = null;
+    public $credentials;
 
     /**
      * checks if the cache is connected to a pool otherwise -> error
@@ -38,14 +38,14 @@ class Cache implements ISingelton
      *
      * @var string
      */
-    private $cacheName = null;
+    private $cacheName;
 
     /**
      * singelton instance
      *
      * @var Cache
      */
-    public static $instance = null;
+    public static $instance;
 
 
     /**
@@ -56,7 +56,7 @@ class Cache implements ISingelton
      *
      * @throws CacheException|\Exception
      */
-    private function __construct($name = null, $credentials = array())
+    protected function __construct($name = null, $credentials = array())
     {
         try {
             $this->cache       = CacheFactory::make($name, $credentials);
@@ -97,7 +97,7 @@ class Cache implements ISingelton
      *
      * @return \chilimatic\lib\Cache\Engine\Cache|null $instance
      */
-    public static function set($key, $value = null, $expiration = null)
+    public static function set(string $key, $value = null, $expiration = null)
     {
         if (!self::$instance) {
             return null;
@@ -116,7 +116,7 @@ class Cache implements ISingelton
      *
      * @return bool
      */
-    public static function get($key)
+    public static function get(string $key)
     {
         if (!self::$instance) {
             return null;
@@ -158,7 +158,7 @@ class Cache implements ISingelton
     /**
      * @return boolean
      */
-    public function isConnected()
+    public function isConnected() : bool
     {
         return $this->connected;
     }

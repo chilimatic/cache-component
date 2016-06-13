@@ -29,7 +29,7 @@ trait CacheTrait
      *
      * @var string
      */
-    protected $md5Sum = null;
+    protected $md5Sum;
 
     /**
      * connected boolean
@@ -43,20 +43,20 @@ trait CacheTrait
      *
      * @var array
      */
-    protected $list = array();
+    protected $list = [];
 
     /**
      * @return bool
      */
-    public function isConnected()
+    public function isConnected() : bool
     {
-        return (bool)$this->connected;
+        return (bool) $this->connected;
     }
 
     /**
      * @param bool $connected
      */
-    protected function setConnected($connected = true)
+    protected function setConnected(bool $connected = true)
     {
         $this->connected = (bool)$connected;
     }

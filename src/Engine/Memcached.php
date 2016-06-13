@@ -38,7 +38,7 @@ class Memcached extends \Memcached implements ICache
                 $this->setConnected(
                     parent::addServer(
                         $server->host,
-                        isset($server->port) ? $server->port : self::DEFAULT_PORT,
+                        $server->port ?? self::DEFAULT_PORT,
                         isset($server->weight) ? $server->weight : null)
                 );
             } else {
@@ -63,7 +63,7 @@ class Memcached extends \Memcached implements ICache
      *
      * @return boolean
      */
-    public function saveCacheListing()
+    public function saveCacheListing() : bool
     {
 
         if (md5(json_encode($this->cacheListing)) === $this->md5Sum) {
@@ -79,16 +79,16 @@ class Memcached extends \Memcached implements ICache
      *
      * @return boolean
      */
-    public function listCache()
+    public function listCache() : bool
     {
 
-        $newlist = array();
+        $newlist = [];
 
         foreach ($this->cacheListing as $key => $val) {
-            $newlist [$key] = new \stdClass();
+            $newlist[$key] = new \stdClass();
 
             foreach ($val as $skey => $sval) {
-                $newlist [$key]->$skey = $sval;
+                $newlist[$key]->{$skey} = $sval;
             }
         }
 
@@ -101,15 +101,14 @@ class Memcached extends \Memcached implements ICache
     /**
      * returns the current status
      */
-    public function getStatus()
+    public function getStatus() : array
     {
 
-        $info_array                 = array();
-        $info_array ['status']      = parent::getStats();
-        $info_array ['version']     = parent::getVersion();
-        $info_array ['server_list'] = parent::getServerList();
-
-        return $info_array;
+        return [
+            'status'        => parent::getStats(),
+            'version'       => parent::getVersion(),
+            'server_list'   => parent::getServerList()
+        ];
     }
 
     /**
@@ -121,7 +120,7 @@ class Memcached extends \Memcached implements ICache
      *
      * @return boolean
      */
-    public function set($key, $value = null, $expiration = 0, &$udf_flags = NULL)
+    public function set(string $key, $value = null, $expiration = 0, &$udf_flags = NULL) : bool
     {
 
         if (parent::set($key, $value, ($expiration ? $expiration : null), $udf_flags)) {
@@ -159,7 +158,7 @@ class Memcached extends \Memcached implements ICache
      *
      * @return mixed
      */
-    public function get($key = null, $cache_cb = null, &$cas_token = null, &$udf_flags = NULL)
+    public function get(string $key = null, $cache_cb = null, &$cas_token = null, &$udf_flags = NULL)
     {
 
         if (isset($this->cacheListing [$key])) {
@@ -177,11 +176,11 @@ class Memcached extends \Memcached implements ICache
      *
      * @return boolean
      */
-    public function flush($delay = 0)
+    public function flush(int $delay = 0) : bool
     {
 
         if (parent::flush((int)$delay)) {
-            $this->cacheListing = array();
+            $this->cacheListing = [];
 
             return true;
         }
@@ -198,9 +197,8 @@ class Memcached extends \Memcached implements ICache
      *
      * @return boolean
      */
-    public function add($key, $value, $expiration = null, &$udf_flags = NULL)
+    public function add(string $key, $value, int $expiration = null, &$udf_flags = NULL) : bool
     {
-
         return $this->set($key, $value, $expiration, $udf_flags);
     }
 
@@ -212,7 +210,7 @@ class Memcached extends \Memcached implements ICache
      *
      * @return boolean
      */
-    public function delete($key, $time = 0)
+    public function delete(string $key, $time = 0) : bool
     {
 
         if (parent::delete($key, ($time ? $time : null))) {
@@ -234,11 +232,11 @@ class Memcached extends \Memcached implements ICache
      *
      * @return boolean
      */
-    public function deleteByKey($server_key, $key, $time = 0)
+    public function deleteByKey(string $server_key, string $key, int $time = 0) : bool
     {
 
         if (parent::deleteByKey($server_key, $key, ($time ? $time : null))) {
-            unset($this->cacheListing [$key]);
+            unset($this->cacheListing[$key]);
             $this->saveCacheListing();
 
             return true;
@@ -254,7 +252,7 @@ class Memcached extends \Memcached implements ICache
      * @param array $keyArray
      * @return bool
      */
-    public function deleteFromList(array $keyArray = [])
+    public function deleteFromList(array $keyArray = []) : bool
     {
 
         if (!$keyArray) {

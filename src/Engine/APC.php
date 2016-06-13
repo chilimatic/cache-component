@@ -57,7 +57,6 @@ class APC implements ICache
      */
     public function __construct($param = null)
     {
-
         /**
          * check if the chache does exists
          */
@@ -88,7 +87,7 @@ class APC implements ICache
      *
      * @return boolean
      */
-    public function saveCacheListing()
+    public function saveCacheListing() : bool
     {
         if (md5(json_encode($this->cacheListing)) === $this->md5Sum) {
             return false;
@@ -103,9 +102,9 @@ class APC implements ICache
      *
      * @return boolean
      */
-    public function listCache()
+    public function listCache() : bool
     {
-        $new_list = array();
+        $new_list = [];
 
         foreach ($this->cacheListing as $key => $val) {
             $new_list [$key] = new \stdClass ();
@@ -130,7 +129,7 @@ class APC implements ICache
      *
      * @return bool string[]
      */
-    public function exists($key)
+    public function exists($key) : bool
     {
         return apc_exists($key);
     }
@@ -270,7 +269,7 @@ class APC implements ICache
      *
      * @return boolean
      */
-    public function set($key, $value = null, $expiration = 0)
+    public function set($key, $value = null, $expiration = 0) : bool
     {
         if (apc_store($key, $value, ($expiration ? $expiration : null))) {
             $expiration = (empty ($expiration)) ? 0 : $expiration;
@@ -319,7 +318,7 @@ class APC implements ICache
      *
      * @return bool
      */
-    public function compile_file($file_name = '', $atomic = false)
+    public function compile_file($file_name = '', $atomic = false) : bool
     {
         if (empty ($file_name)){
             return false;
@@ -397,7 +396,7 @@ class APC implements ICache
      *
      * @return boolean
      */
-    public function delete($key, $time = 0)
+    public function delete($key, $time = 0) : bool
     {
         if (apc_delete($key)) {
             unset ($this->cacheListing [$key]);
@@ -420,13 +419,14 @@ class APC implements ICache
      * @param array $keyArray
      * @return bool
      */
-    public function deleteFromList(array $keyArray = [])
+    public function deleteFromList(array $keyArray = []) : bool
     {
-        if (empty ($keyArray))
+        if (!$keyArray) {
             return false;
+        }
 
         foreach ($keyArray as $key_del) {
-            if (empty ($this->cacheListing)) {
+            if (!$this->cacheListing) {
                 break;
             }
 

@@ -39,7 +39,7 @@ Interface ICache
      *
      * @return boolean
      */
-    public function get($key = null);
+    public function get(string $key = null);
 
 
     /**
@@ -51,7 +51,7 @@ Interface ICache
      *
      * @return boolean
      */
-    public function set($key, $value = null, $expiration = 0);
+    public function set(string $key, $value = null, $expiration = 0) : bool;
 
 
     /**
@@ -71,7 +71,7 @@ Interface ICache
      * @return
      * @internal param int $ttl
      */
-    public function delete($key, $time = 0);
+    public function delete(string $key, $time = 0);
 
 
     /**

@@ -27,14 +27,14 @@ class CacheFactory
     /**
      * Init like always enables to reset the class
      *
-     * @param $name
+     * @param string $name
      * @param array $credentials
      *
      * @throws CacheException|\Exception
      *
      * @return mixed
      */
-    public static function make($name, $credentials = [])
+    public static function make(string $name, $credentials = [])
     {
         if (!$name && !$credentials) {
             return null;

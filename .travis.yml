@@ -19,6 +19,8 @@ before_install:
     - pecl channel-update pecl.php.net
     - pecl config-set preferred_state beta
     - echo yes | pecl upgrade apcu
+    - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
 
 install:
     - travis_retry composer update --no-interaction --prefer-dist

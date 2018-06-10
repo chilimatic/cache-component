@@ -1,4 +1,7 @@
 # cache-component
+
+[![Build Status](https://travis-ci.org/chilimatic/cache-component.svg?branch=master)](https://travis-ci.org/chilimatic/cache-component)
+
 Currently there are 3 adapters: 
 
 Memcached, Apcu and Memory

@@ -1,13 +1,25 @@
+dist: trusty
+sudo: false
 language: php
+
+cache:
+    directories:
+        - $HOME/.composer/cache
 php:
   - '7.1'
   - '7.2'
   - hhvm # on Trusty only
   - nightly
 
-before_script:
-  - sudo apt-get update
-  - sudo apt-get install memcached
-  - sudo pecl install apcu
-  - composer install
-  - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+services:
+  - memcached
+
+
+before_install:
+    - pecl channel-update pecl.php.net
+    - pecl config-set preferred_state beta
+    - echo yes | pecl upgrade apcu
+
+install:
+    - rm composer.lock
+    - travis_retry composer update --no-interaction --prefer-dist

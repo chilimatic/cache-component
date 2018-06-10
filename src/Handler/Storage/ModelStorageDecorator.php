@@ -1,12 +1,5 @@
 <?php
-/**
- *
- * @author j
- * Date: 3/21/15
- * Time: 8:42 PM
- *
- * File: ModelStorageDecorator.php
- */
+declare(strict_types=1);
 
 namespace chilimatic\lib\cache\handler\storage;
 
@@ -57,7 +50,7 @@ class ModelStorageDecorator
     /**
      * @return AbstractModel
      */
-    public function getModel()
+    public function getModel(): AbstractModel
     {
         return $this->model;
     }
@@ -67,7 +60,7 @@ class ModelStorageDecorator
      *
      * @return $this
      */
-    public function setModel($model)
+    public function setModel($model): self
     {
         $this->model = $model;
 
@@ -87,7 +80,7 @@ class ModelStorageDecorator
      *
      * @return $this
      */
-    public function setData($data)
+    public function setData($data): self
     {
         $this->data = $data;
 
@@ -96,6 +89,7 @@ class ModelStorageDecorator
 
     /**
      * @return \ReflectionClass
+     * @throws \ReflectionException
      */
     public function getReflection()
     {
@@ -111,7 +105,7 @@ class ModelStorageDecorator
      *
      * @return $this
      */
-    public function setReflection($reflection)
+    public function setReflection($reflection): self
     {
         $this->reflection = $reflection;
 

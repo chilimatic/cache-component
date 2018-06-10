@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace chilimatic\lib\Cache\Engine;
 
 /**
@@ -11,7 +12,7 @@ Interface ICache
     /**
      * @var int
      */
-    const NO_DATA_TO_SAVE = 1;
+    public const NO_DATA_TO_SAVE = 1;
 
     /**
      * Constructor in every cache abstractor should get the
@@ -29,7 +30,7 @@ Interface ICache
      *
      * @return boolean
      */
-    public function saveCacheListing();
+    public function saveCacheListing(): bool;
 
 
     /**
@@ -37,7 +38,7 @@ Interface ICache
      *
      * @param string $key
      *
-     * @return boolean
+     * @return mixed
      */
     public function get(string $key = null);
 
@@ -51,7 +52,7 @@ Interface ICache
      *
      * @return boolean
      */
-    public function set(string $key, $value = null, $expiration = 0) : bool;
+    public function set(string $key, $value = null, int $expiration = 0) : bool;
 
 
     /**
@@ -71,7 +72,7 @@ Interface ICache
      * @return
      * @internal param int $ttl
      */
-    public function delete(string $key, $time = 0);
+    public function delete(string $key,int $time = 0);
 
 
     /**

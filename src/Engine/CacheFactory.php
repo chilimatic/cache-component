@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace chilimatic\lib\Cache\Engine;
 
 use chilimatic\lib\Cache\Exception\CacheException;
@@ -41,7 +42,7 @@ class CacheFactory
         }
 
         try {
-            $cacheName = (empty($name)) ? self::CACHE_DEFAULT_TYPE : $name;
+            $cacheName = empty($name) ? self::CACHE_DEFAULT_TYPE : $name;
             $c         = '\\' . __NAMESPACE__ . '\\' . ucfirst($cacheName);
             // check if the class exists or can be loaded
             if (!class_exists($c, true)) {
@@ -53,7 +54,7 @@ class CacheFactory
              */
             $cache = new $c($credentials);
 
-            if ($cache->isConnected() == false) {
+            if ($cache->isConnected() === false) {
                 throw new CacheException(_('The Cache could not establish connection:') . $c, self::ERROR_CACHE_MISSING, E_USER_ERROR, __FILE__, __LINE__);
             }
 

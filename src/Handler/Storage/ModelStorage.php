@@ -1,12 +1,6 @@
 <?php
-/**
- *
- * @author j
- * Date: 3/20/15
- * Time: 4:44 PM
- *
- * File: Model.php
- */
+declare(strict_types=1);
+
 namespace chilimatic\lib\cache\handler\storage;
 use chilimatic\lib\database\sql\orm\AbstractModel;
 
@@ -27,7 +21,7 @@ class ModelStorage implements \Countable, \Iterator, \Serializable
      *
      * @return string
      */
-    public function generateHash(AbstractModel $model)
+    public function generateHash(AbstractModel $model): string
     {
         return md5(serialize($model));
     }
@@ -37,7 +31,7 @@ class ModelStorage implements \Countable, \Iterator, \Serializable
      *
      * @return bool
      */
-    public function contains(AbstractModel $model)
+    public function contains(AbstractModel $model): bool
     {
         foreach ($this->storage as $key => $storedModel) {
             if ($model === $storedModel->getModel()) {
@@ -107,6 +101,7 @@ class ModelStorage implements \Countable, \Iterator, \Serializable
      * @param array $param
      *
      * @return null
+     * @throws \ReflectionException
      */
     public function findByParam($modelName, $param)
     {
@@ -114,7 +109,7 @@ class ModelStorage implements \Countable, \Iterator, \Serializable
          * @var ModelStorageDecorator $storedModel
          */
         foreach ($this->storage as $key => $storedModel) {
-            if ($modelName != get_class($storedModel)) {
+            if ($modelName !== \get_class($storedModel)) {
                 continue;
             }
 
@@ -130,9 +125,10 @@ class ModelStorage implements \Countable, \Iterator, \Serializable
      * @param ModelStorageDecorator $storedModel
      * @param array $param
      *
-     * @return null|AbstractModel
+     * @return bool
+     * @throws \ReflectionException
      */
-    public function containsParam(ModelStorageDecorator $storedModel, $param)
+    public function containsParam(ModelStorageDecorator $storedModel, $param): bool
     {
         if (!$storedModel || !$param) {
             return false;
@@ -145,14 +141,14 @@ class ModelStorage implements \Countable, \Iterator, \Serializable
             }
 
             if ($p->isPublic()) {
-                if ($propertyValue != $storedModel->$propertyName) {
+                if ($propertyValue !== $storedModel->$propertyName) {
                     return false;
                 }
             }
 
             if ($p->isPrivate() || $p->isProtected()) {
                 $p->setAccessible(true);
-                if ($propertyValue != $storedModel->$propertyName) {
+                if ($propertyValue !== $storedModel->$propertyName) {
                     return false;
                 }
             }
@@ -170,7 +166,7 @@ class ModelStorage implements \Countable, \Iterator, \Serializable
     public function get(AbstractModel $model, $param = null)
     {
         if ($this->contains($model)) {
-            return $this->storage[$this->generateHash($model, $param)]->getModel();
+            return $this->storage[md5($this->generateHash($model) . json_encode($param))]->getModel();
         }
 
         return null;

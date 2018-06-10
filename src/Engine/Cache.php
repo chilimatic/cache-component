@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace chilimatic\lib\Cache\Engine;
 
 use chilimatic\lib\Cache\Exception\CacheException;
@@ -7,8 +7,7 @@ use chilimatic\lib\Interfaces\ISingelton;
 
 /**
  * Class Cache
- *
- * @package chilimatic\cache
+ * @package chilimatic\lib\Cache\Engine
  */
 class Cache implements ISingelton
 {
@@ -51,21 +50,17 @@ class Cache implements ISingelton
     /**
      * Constructor sets credentials for the Caching
      *
-     * @param null $name
+     * @param string $name
      * @param array $credentials
      *
      * @throws CacheException|\Exception
      */
-    protected function __construct($name = null, $credentials = array())
+    protected function __construct(string $name, $credentials = [])
     {
-        try {
-            $this->cache       = CacheFactory::make($name, $credentials);
-            $this->cacheName   = get_class($this->cache);
-            $this->connected   = $this->cache->isConnected();
-            $this->credentials = $credentials;
-        } catch (CacheException $e) {
-            throw $e;
-        }
+        $this->cache       = CacheFactory::make($name, $credentials);
+        $this->cacheName   = \get_class($this->cache);
+        $this->connected   = $this->cache->isConnected();
+        $this->credentials = $credentials;
     }
 
     /**
@@ -74,12 +69,13 @@ class Cache implements ISingelton
      * @param \stdClass $param
      *
      * @return Cache
+     * @throws CacheException
      */
-    public static function getInstance($param = null)
+    public static function getInstance($param = null): Cache
     {
-        if (!self::$instance instanceof Cache) {
+        if (!self::$instance instanceof self) {
             $type        = $param->type;
-            $credentials = (property_exists($param, 'credentials')) ? $param->credentials : null;
+            $credentials = property_exists($param, 'credentials') ? $param->credentials : null;
 
             self::$instance = new Cache($type, $credentials);
         }
@@ -114,7 +110,7 @@ class Cache implements ISingelton
      *
      * @param string $key
      *
-     * @return bool
+     * @return null|mixed
      */
     public static function get(string $key)
     {
@@ -144,9 +140,9 @@ class Cache implements ISingelton
     /**
      * gets the cache info
      *
-     * @return object
+     * @return array
      */
-    public static function getStatus()
+    public static function getStatus(): array
     {
         if (!self::$instance) {
             return null;
@@ -166,7 +162,7 @@ class Cache implements ISingelton
     /**
      * @return array
      */
-    public function getCredentials()
+    public function getCredentials(): array
     {
         return $this->credentials;
     }
@@ -174,11 +170,27 @@ class Cache implements ISingelton
     /**
      * @param array $credentials
      */
-    public function setCredentials($credentials)
+    public function setCredentials(array $credentials)
     {
         $this->credentials = $credentials;
     }
 
+    /**
+     * @return string
+     */
+    public function getCacheName(): string
+    {
+        return (string)$this->cacheName;
+    }
 
+    /**
+     * @param string $cacheName
+     * @return Cache
+     */
+    public function setCacheName(string $cacheName): self
+    {
+        $this->cacheName = $cacheName;
+        return $this;
+    }
 }
     

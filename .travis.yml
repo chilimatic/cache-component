@@ -7,7 +7,7 @@ php:
 
 before_script:
   - sudo apt-get update
-  - sudo apt-get install memcached php-memcached
+  - sudo apt-get install memcached
   - sudo pecl install apcu
   - composer install
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini

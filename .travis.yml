@@ -20,6 +20,7 @@ before_install:
     - pecl config-set preferred_state beta
     - echo yes | pecl upgrade apcu
     - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    - echo "apc.enable_cli=1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 
 install:

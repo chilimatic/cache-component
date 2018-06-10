@@ -7,4 +7,6 @@ php:
 
 before_script:
   - sudo apt-get update
-  - sudo apt-get install memcached
+  - sudo apt-get install memcached php-memcached
+  - sudo pecl install apcu
+  - composer update

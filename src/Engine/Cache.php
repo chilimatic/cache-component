@@ -139,9 +139,7 @@ class Cache implements ISingelton
     public static function getInstance($param = null): Cache
     {
         if (!self::$instance instanceof self) {
-            if ($param instanceOf \stdClass) {
-                $param = json_decode(json_encode($param));
-            }
+            $param = json_decode(json_encode($param), true);
 
             self::$instance = new Cache(
                 $param[self::IDX_ADAPTER_NAME],

@@ -64,6 +64,23 @@ class CacheTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(APCU::class, $cache->getEngine());
     }
 
+
+    /**
+     * @test
+     * @throws \chilimatic\lib\Cache\Exception\CacheException
+     */
+    public function transformStdClassToArrayInternally(): void
+    {
+        $setting = json_decode(json_encode(self::DEFAULT_MEMCACHED_SETUP));
+
+        $cache = Cache::getInstance([
+            Cache::IDX_ADAPTER_NAME => Memcached::class,
+            Cache::IDX_PARAMETERS => $setting
+        ]);
+
+        self::assertInstanceOf(Memcached::class, $cache->getEngine());
+    }
+
     /**
      * @test
      * @throws \chilimatic\lib\Cache\Exception\CacheException

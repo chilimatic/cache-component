@@ -3,7 +3,7 @@
   "description": "cache component within the chilimatic framework",
   "type": "library",
   "license": "MIT",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "authors": [
     {
       "name": "Jakob Oberhummer",

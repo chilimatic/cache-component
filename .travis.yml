@@ -21,5 +21,4 @@ before_install:
     - echo yes | pecl upgrade apcu
 
 install:
-    - rm composer.lock
     - travis_retry composer update --no-interaction --prefer-dist

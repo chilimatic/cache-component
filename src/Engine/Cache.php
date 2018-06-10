@@ -11,12 +11,16 @@ use chilimatic\lib\Interfaces\ISingelton;
  */
 class Cache implements ISingelton
 {
+
+    public const IDX_ADAPTER_NAME = 'adapter';
+    public const IDX_PARAMETERS = 'param';
+
     /**
      * cache object
      *
-     * @var object
+     * @var ICache
      */
-    public $cache;
+    private $engine;
 
     /**
      * login credentials if needed
@@ -48,60 +52,63 @@ class Cache implements ISingelton
 
 
     /**
-     * Constructor sets credentials for the Caching
-     *
      * @param string $name
      * @param array $credentials
      *
      * @throws CacheException|\Exception
      */
-    protected function __construct(string $name, $credentials = [])
+    protected function __construct(string $name, array $credentials = [])
     {
-        $this->cache       = CacheFactory::make($name, $credentials);
-        $this->cacheName   = \get_class($this->cache);
-        $this->connected   = $this->cache->isConnected();
+        $this->engine      = CacheFactory::make($name, $credentials);
+        $this->cacheName   = $name;
+        $this->connected   = $this->engine->isConnected();
         $this->credentials = $credentials;
     }
 
     /**
-     * singelton constructor
-     *
-     * @param \stdClass $param
-     *
-     * @return Cache
-     * @throws CacheException
-     */
-    public static function getInstance($param = null): Cache
-    {
-        if (!self::$instance instanceof self) {
-            $type        = $param->type;
-            $credentials = property_exists($param, 'credentials') ? $param->credentials : null;
-
-            self::$instance = new Cache($type, $credentials);
-        }
-
-        return self::$instance;
-    }
-
-
-    /**
-     * set wrapper for caching
-     *
      * @param string $key
      * @param mixed $value
      * @param int $expiration
      *
      * @return \chilimatic\lib\Cache\Engine\Cache|null $instance
      */
-    public static function set(string $key, $value = null, $expiration = null)
+    public static function set(string $key, $value = null, int $expiration = 0): ?Cache
     {
         if (!self::$instance) {
             return null;
         }
 
-        self::$instance->cache->set($key, $value, $expiration);
+        self::$instance->engine->set($key, $value, $expiration);
 
         return self::$instance;
+    }
+
+    /**
+     * @param string $key
+     * @return Cache|null
+     */
+    public static function delete(string $key): ?Cache
+    {
+        if (!self::$instance) {
+            return null;
+        }
+
+        self::$instance->engine->delete($key);
+
+        return self::$instance;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public static function has(string $key): bool
+    {
+        if (!self::$instance) {
+            return false;
+        }
+
+        return self::$instance->engine->has($key);
     }
 
 
@@ -118,22 +125,38 @@ class Cache implements ISingelton
             return null;
         }
 
-        return self::$instance->cache->get($key);
+        return self::$instance->engine->get($key);
     }
 
-
     /**
-     * gets the cache object
+     * singelton constructor
      *
-     * @return object
+     * @param \stdClass|array $param
+     *
+     * @return Cache
+     * @throws CacheException
      */
-    public static function getCache()
+    public static function getInstance($param = null): Cache
     {
-        if (!self::$instance) {
-            return null;
+        if (!self::$instance instanceof self) {
+            if ($param instanceOf \stdClass) {
+                $param = json_decode(json_encode($param));
+            }
+
+            self::$instance = new Cache(
+                $param[self::IDX_ADAPTER_NAME],
+                $param[self::IDX_PARAMETERS] ?? []
+            );
         }
 
-        return self::$instance->cache;
+        return self::$instance;
+    }
+
+    public static function destroy(): void
+    {
+        if (self::$instance instanceof self) {
+            self::$instance = null;
+        }
     }
 
 
@@ -148,7 +171,21 @@ class Cache implements ISingelton
             return null;
         }
 
-        return self::$instance->cache->getStatus();
+        return self::$instance->engine->getStatus();
+    }
+
+    /**
+     * gets the cache object
+     *
+     * @return object
+     */
+    public static function getCache()
+    {
+        if (!self::$instance) {
+            return null;
+        }
+
+        return self::$instance->engine;
     }
 
     /**
@@ -191,6 +228,14 @@ class Cache implements ISingelton
     {
         $this->cacheName = $cacheName;
         return $this;
+    }
+
+    /**
+     * @return ICache
+     */
+    public function getEngine(): ICache
+    {
+        return $this->engine;
     }
 }
     

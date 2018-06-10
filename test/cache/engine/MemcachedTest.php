@@ -21,7 +21,7 @@ class MemcachedTest extends \PHPUnit\Framework\TestCase
      */
     public function implementsTheCorrectInterface(): void
     {
-        $this->assertInstanceOf(ICache::class, new Memcached());
+        $this->assertInstanceOf(ICache::class, new Memcached([]));
     }
 
     /**

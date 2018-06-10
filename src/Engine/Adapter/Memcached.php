@@ -9,10 +9,15 @@ use chilimatic\lib\Cache\Engine\ICache;
 
 class Memcached implements ICache
 {
-    /**
-     * cache trait to reduce code duplication
-     */
     use CacheTrait;
+
+    public const IDX_PERSISTENT_ID = 'persistent_id';
+    public const IDX_CALLBACK = 'callback';
+    public const IDX_SERVER_LIST = 'server_list';
+    public const IDX_OPTIONS = 'options';
+    public const IDX_SERVER_HOST = 'host';
+    public const IDX_SERVER_PORT = 'port';
+    public const IDX_SERVER_WEIGHT = 'weight';
 
     /**
      * @var int
@@ -27,41 +32,52 @@ class Memcached implements ICache
     /**
      * construct wrapper
      *
-     * @param \stdClass $param
+     * @param \stdClass|array $param
      */
     public function __construct($param = null)
     {
-        $this->setupEngine($param);
-    }
 
-    private function setupEngine($param): void
-    {
         if ($param instanceof \stdClass) {
             $param = json_decode(json_encode($param), true);
         }
 
-        $this->engine = new \Memcached($param['persistent_id'] ?? null, $param['callback'] ?? null);
+        $this->setupEngine($param);
+    }
 
-        if (isset($param['server_list'])) {
-            $serverList = $param['server_list'];
+    /**
+     * @param array $param
+     */
+    private function setupEngine(array $param): void
+    {
+        $this->engine = new \Memcached(
+            $param[self::IDX_PERSISTENT_ID] ?? null,
+            $param[self::IDX_CALLBACK] ?? null
+        );
+
+        if (isset($param[self::IDX_SERVER_LIST])) {
+            $serverList = $param[self::IDX_SERVER_LIST];
             if (\count($serverList) === 1) {
                 $serverList = array_pop($serverList);
                 $this->setConnected(
                     $this->engine->addServer(
-                        $serverList['host'],
-                        $serverList['port'] ?? self::DEFAULT_PORT,
-                        $serverList['weight'] ?? null)
+                        $serverList[self::IDX_SERVER_HOST],
+                        $serverList[self::IDX_SERVER_PORT] ?? self::DEFAULT_PORT,
+                        $serverList[self::IDX_SERVER_WEIGHT] ?? null)
                 );
             } else {
                 $this->setConnected($this->engine->addServers($serverList));
             }
+
+            if (!empty($param[self::IDX_OPTIONS])) {
+                $this->engine->setOptions($param[self::IDX_OPTIONS]);
+            }
         }
 
         // Get the Cache Listing
-        $this->entryMetaData = $this->engine->get('cacheListing');
+        $this->entryMetaData = $this->engine->get(self::KEY_CACHE_LIST);
 
         if ($this->entryMetaData === false) {
-            $this->engine->add('cacheListing', []);
+            $this->engine->add(self::KEY_CACHE_LIST, []);
             $this->entryMetaData = [];
         }
 
@@ -82,33 +98,8 @@ class Memcached implements ICache
             return false;
         }
 
-        return $this->engine->set('cacheListing', $this->entryMetaData);
+        return $this->engine->set(self::KEY_CACHE_LIST, $this->entryMetaData);
     }
-
-    /**
-     * a listing of all cached entries which have been
-     * inserted through this wrapper
-     *
-     * @return boolean
-     */
-    public function listCache() : bool
-    {
-
-        $newList = [];
-
-        foreach ($this->entryMetaData as $key => $val) {
-            $newList[$key] = new \stdClass();
-
-            foreach ($val as $sKey => $sval) {
-                $newList[$key]->{$sKey} = $sval;
-            }
-        }
-
-        $this->list = $newList;
-
-        return true;
-    }
-
 
     /**
      * returns the current status
@@ -146,17 +137,12 @@ class Memcached implements ICache
     }
 
     /**
-     * get method
-     *
-     * @param $key       string
-     * @param $cache_cb  callable
-     *                   [optional]
-     * @param $cas_token float
-     *                   [optional]
-     *
-     * @return mixed
+     * @param string $key
+     * @param null $cache_cb
+     * @param null $cas_token
+     * @return bool|mixed
      */
-    public function get(string $key = null, $cache_cb = null, &$cas_token = null)
+    public function get(string $key, $cache_cb = null, &$cas_token = null)
     {
         if (isset($this->entryMetaData[$key])) {
             if ($cas_token) {
@@ -167,6 +153,15 @@ class Memcached implements ICache
         }
 
         return false;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        return (bool) $this->engine->get($key);
     }
 
     /**

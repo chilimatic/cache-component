@@ -7,12 +7,13 @@ namespace chilimatic\lib\Cache\Engine;
  *
  * @package chilimatic\cache
  */
-Interface ICache
+interface ICache
 {
     /**
      * @var int
      */
     public const NO_DATA_TO_SAVE = 1;
+    public const KEY_CACHE_LIST = 'cacheListing';
 
     /**
      * Constructor in every cache abstractor should get the
@@ -40,8 +41,13 @@ Interface ICache
      *
      * @return mixed
      */
-    public function get(string $key = null);
+    public function get(string $key);
 
+    /**
+     * @param string|null $key
+     * @return bool
+     */
+    public function has(string $key): bool;
 
     /**
      * Sets a cache entry by key

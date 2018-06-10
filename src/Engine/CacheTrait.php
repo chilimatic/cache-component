@@ -33,13 +33,6 @@ trait CacheTrait
     protected $connected = false;
 
     /**
-     * list array of all entries
-     *
-     * @var array
-     */
-    protected $list = [];
-
-    /**
      * @return bool
      */
     public function isConnected() : bool
@@ -66,7 +59,8 @@ trait CacheTrait
         $newListing = [
             'key'        => $key,
             'expiration' => $expiration,
-            'updated'    => (string)date('Y-m-d H:i:s')];
+            'updated'    => (string)date('Y-m-d H:i:s')
+        ];
 
         if (isset($this->entryMetaData[$key])) {
             $this->entryMetaData[$key] = array_merge($this->entryMetaData[$key], $newListing);
@@ -101,6 +95,27 @@ trait CacheTrait
         }
 
         return true;
+    }
+
+    /**
+     * a listing of all cached entries which have been
+     * inserted through this wrapper
+     *
+     * @return array
+     */
+    public function listEntries() : array
+    {
+        $newList = [];
+
+        foreach ($this->entryMetaData as $key => $val) {
+            $newList[$key] = [];
+
+            foreach ($val as $sKey => $sval) {
+                $newList[$key][$sKey] = $sval;
+            }
+        }
+
+        return $newList;
     }
 
 }

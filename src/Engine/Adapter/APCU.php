@@ -9,12 +9,8 @@ use chilimatic\lib\Cache\Engine\ICache;
 use chilimatic\lib\Cache\Exception\CacheException;
 
 
-class APC implements ICache
+class APCU implements ICache
 {
-
-    /**
-     * cache trait to reduce code duplication
-     */
     use CacheTrait;
 
     /**
@@ -23,7 +19,7 @@ class APC implements ICache
      *
      * @var int
      */
-    public const apcu_LIST_ACTIVE = 1;
+    public const APCU_LIST_ACTIVE = 1;
 
     /**
      *
@@ -31,7 +27,7 @@ class APC implements ICache
      *
      * @var int
      */
-    public const apcu_LIST_DELETED = 2;
+    public const APCU_LIST_DELETED = 2;
 
     /**
      *
@@ -39,7 +35,7 @@ class APC implements ICache
      *
      * @var int
      */
-    public const apcu_BIN_VERIFY_MD5 = 1;
+    public const APCU_BIN_VERIFY_MD5 = 1;
 
     /**
      *
@@ -47,7 +43,7 @@ class APC implements ICache
      *
      * @var int
      */
-    public const apcu_BIN_VERIFY_CRC32 = 2;
+    public const APCU_BIN_VERIFY_CRC32 = 2;
 
 
     /**
@@ -69,11 +65,11 @@ class APC implements ICache
 
         // Get the Cache Listing
 
-        if ($this->exists('cacheListing') === false) {
-            apcu_add('cacheListing', []);
+        if ($this->exists(self::KEY_CACHE_LIST) === false) {
+            apcu_add(self::KEY_CACHE_LIST, []);
             $this->entryMetaData = [];
         } else {
-            $this->entryMetaData = apcu_fetch('cacheListing');
+            $this->entryMetaData = apcu_fetch(self::KEY_CACHE_LIST);
         }
 
         // check sum for the saving process
@@ -93,30 +89,15 @@ class APC implements ICache
             return false;
         }
 
-        return apcu_add('cacheListing', $this->entryMetaData);
+        return apcu_store(self::KEY_CACHE_LIST, $this->entryMetaData);
     }
 
     /**
-     * a listing of all cached entries which have been
-     * inserted through this wrapper
-     *
-     * @return boolean
+     * @param string $key
+     * @return bool
      */
-    public function listCache() : bool
-    {
-        $new_list = [];
-
-        foreach ($this->entryMetaData as $key => $val) {
-            $new_list [$key] = new \stdClass ();
-
-            foreach ($val as $skey => $sval) {
-                $new_list [$key]->{$skey} = $sval;
-            }
-        }
-
-        $this->list = $new_list;
-
-        return true;
+    public function has(string $key): bool {
+        return $this->exists($key);
     }
 
     /**
@@ -129,7 +110,7 @@ class APC implements ICache
      *
      * @return bool string[]
      */
-    public function exists($key) : bool
+    public function exists(string $key) : bool
     {
         return apcu_exists($key);
     }

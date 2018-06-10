@@ -9,9 +9,6 @@ use chilimatic\lib\Cache\Engine\ICache;
 
 class Memory implements ICache
 {
-    /**
-     * cache trait to reduce code duplication
-     */
     use CacheTrait;
 
     /**
@@ -37,7 +34,9 @@ class Memory implements ICache
     /**
      * @param \stdClass $param
      */
-    public function __construct($param = null){}
+    public function __construct($param = null){
+        $this->setConnected(true);
+    }
 
     /**
      * @return boolean
@@ -47,7 +46,6 @@ class Memory implements ICache
         return true;
     }
 
-
     /**
      * returns the current status
      */
@@ -55,7 +53,7 @@ class Memory implements ICache
     {
         return [
             'status'        => [
-                'entries-stored' => \count($this->list),
+                'entries-stored' => \count($this->store),
                 'accessed'       => $this->readCount,
                 'removed'        => $this->removeCount,
                 'written'        => $this->writeCount,
@@ -64,8 +62,6 @@ class Memory implements ICache
     }
 
     /**
-     * set method
-     *
      * @param $key        string
      * @param $value      mixed
      * @param $expiration int
@@ -87,7 +83,7 @@ class Memory implements ICache
      * @param string|null $key
      * @return mixed|null
      */
-    public function get(string $key = null)
+    public function get(string $key)
     {
         $this->readCount++;
         if (isset($this->entryMetaData[$key])) {
@@ -95,6 +91,15 @@ class Memory implements ICache
         }
 
         return null;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        return array_key_exists($key, $this->store);
     }
 
     /**

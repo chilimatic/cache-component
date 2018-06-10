@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use chilimatic\lib\Cache\Engine\Adapter\APC;
+use chilimatic\lib\Cache\Engine\Adapter\APCU;
 use chilimatic\lib\Cache\Engine\ICache;
 
 class APCTest extends \PHPUnit\Framework\TestCase
@@ -12,7 +12,7 @@ class APCTest extends \PHPUnit\Framework\TestCase
      */
     public function implementsTheCorrectInterface(): void
     {
-        $this->assertInstanceOf(ICache::class, new APC());
+        $this->assertInstanceOf(ICache::class, new APCU());
     }
 
     /**
@@ -21,7 +21,7 @@ class APCTest extends \PHPUnit\Framework\TestCase
      */
     public function isConnected(): void
     {
-        $cache = new APC();
+        $cache = new APCU();
         self::assertTrue($cache->isConnected());
     }
     
@@ -31,7 +31,7 @@ class APCTest extends \PHPUnit\Framework\TestCase
      */
     public function setValue(): void
     {
-        $cache = new APC();
+        $cache = new APCU();
 
         $value = ['12'];
         $cache->set('test', ['12']);
@@ -45,7 +45,7 @@ class APCTest extends \PHPUnit\Framework\TestCase
      */
     public function setValueAndUpdateIt(): void
     {
-        $cache = new APC();
+        $cache = new APCU();
 
         $value = ['12'];
         $value2 = ['14'];
@@ -65,7 +65,7 @@ class APCTest extends \PHPUnit\Framework\TestCase
      */
     public function setValueAndRemoveIt(): void
     {
-        $cache = new APC();
+        $cache = new APCU();
 
         $value = ['12'];
         $cache->set('test', $value);
